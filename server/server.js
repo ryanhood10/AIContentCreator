@@ -4,6 +4,7 @@ const path = require("path");
 const cors = require("cors");
 const https = require("https");
 const selfsigned = require("selfsigned");
+const axios = require("axios");
 
 dotenv.config();
 
@@ -19,6 +20,15 @@ const privateKey = pems.private;
 const certificate = pems.cert;
 
 const credentials = { key: privateKey, cert: certificate };
+
+// Axios instance for OpenAI API requests
+const openaiAxios = axios.create({
+  baseURL: 'https://api.openai.com',
+  headers: {
+    'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+    'Content-Type': 'application/json',
+  },
+});
 
 app.post('/completions', async (req, res) => {
   const postData = JSON.stringify({
@@ -64,6 +74,28 @@ app.post('/completions', async (req, res) => {
     res.status(500).send({ error: 'Failed to fetch data from OpenAI' });
   }
 });
+
+app.post('/dalleCompletion', async (req, res) => {
+  const { dallePrompt, imageSize } = req.body;
+
+  const postData = {
+    model: "dall-e-3",
+    prompt: dallePrompt,
+    n: 1,
+    size: imageSize ? imageSize : "1024x1024", // Use provided size or default to "1024x1024"
+  };
+
+  try {
+    const response = await openaiAxios.post('/v1/images/generations', postData);
+    const imageUrl = response.data.data[0].url; // Assuming the response structure based on OpenAI's API
+
+    res.json({ imageUrl });
+  } catch (error) {
+    console.error('Failed to fetch image from DALL-E:', error);
+    res.status(500).json({ error: 'Failed to fetch image from DALL-E' });
+  }
+});
+
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, '../client/build')));
