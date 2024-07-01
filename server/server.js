@@ -5,8 +5,25 @@ const cors = require("cors");
 const https = require("https");
 const selfsigned = require("selfsigned");
 const axios = require("axios");
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 dotenv.config();
+
+const gemini_api_key = process.env.GEMINI_API_KEY;
+if (!gemini_api_key) {
+  console.error("Gemini API key is not set in the environment variables.");
+  process.exit(1);
+}
+
+const googleAI = new GoogleGenerativeAI(gemini_api_key);
+const geminiConfig = {
+  temperature: 0.9,
+  topP: 1,
+  topK: 1,
+  maxOutputTokens: 4096,
+};
+
+
 
 const app = express();
 
@@ -93,6 +110,35 @@ app.post('/dalleCompletion', async (req, res) => {
   } catch (error) {
     console.error('Failed to fetch image from DALL-E:', error);
     res.status(500).json({ error: 'Failed to fetch image from DALL-E' });
+  }
+});
+
+app.post('/geminiCompletion', async (req, res) => {
+  try {
+    console.log('Received request for Gemini completion');
+    console.log('Headers:', req.headers);
+    console.log('Body:', req.body);
+
+    const prompt = req.body.message;
+
+    if (!prompt) {
+      console.error('No message provided in the request body');
+      return res.status(400).send({ error: 'No message provided in the request body' });
+    }
+
+    const geminiModel = googleAI.getGenerativeModel({
+      model: 'gemini-pro',
+      geminiConfig,
+    });
+
+    const result = await geminiModel.generateContent(prompt);
+    const response = await result.response.text();
+
+    console.log('Response:', response);
+    res.send({ text: response });
+  } catch (error) {
+    console.error('Error in /geminiCompletion route:', error);
+    res.status(500).send({ error: 'Failed to fetch data from Gemini' });
   }
 });
 
