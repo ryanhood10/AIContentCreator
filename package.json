@@ -2,7 +2,7 @@
     "name": "cover-letter-generator",
     "version": "1.0.0",
     "scripts": {
-        "start": "node server/index.js",
+        "start": "node server/server.js",
         "heroku-postbuild": "npm install --prefix client && npm run build --prefix client"
     },
     "dependencies": {
