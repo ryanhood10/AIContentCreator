@@ -95,9 +95,11 @@ app.post('/geminiCompletion', async (req, res) => {
 
     // Dynamically import node-fetch
     const fetch = (await import('node-fetch')).default;
+    const { Headers } = await import('node-fetch');
 
-    // Make the fetch function available globally for the @google/generative-ai package
+    // Make the fetch function and Headers class available globally for the @google/generative-ai package
     global.fetch = fetch;
+    global.Headers = Headers;
 
     const result = await geminiModel.generateContent(prompt);
     const response = await result.response.text();
