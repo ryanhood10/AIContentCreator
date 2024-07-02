@@ -1,10 +1,10 @@
 require('dotenv').config();
-
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const fetch = require('node-fetch');
 const axios = require('axios');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const gemini_api_key = process.env.GEMINI_API_KEY;
 if (!gemini_api_key) {
@@ -45,7 +45,7 @@ app.post('/completions', async (req, res) => {
     const response = await openaiAxios.post('/v1/chat/completions', postData);
     res.send(response.data);
   } catch (error) {
-    console.error(error);
+    console.error('Error in /completions route:', error);
     res.status(500).send({ error: 'Failed to fetch data from OpenAI' });
   }
 });
@@ -84,15 +84,19 @@ app.post('/geminiCompletion', async (req, res) => {
       return res.status(400).send({ error: 'No message provided in the request body' });
     }
 
+    console.log('Gemini API Key:', gemini_api_key);
+    console.log('Gemini Config:', geminiConfig);
+
     const geminiModel = googleAI.getGenerativeModel({
       model: 'gemini-pro',
       geminiConfig,
     });
 
-    const result = await geminiModel.generateContent(prompt);
+    console.log('Generating content for prompt:', prompt);
+    const result = await geminiModel.generateContent(prompt, { fetch });
     const response = await result.response.text();
 
-    console.log('Response:', response);
+    console.log('Response from Gemini:', response);
     res.send({ text: response });
   } catch (error) {
     console.error('Error in /geminiCompletion route:', error);
