@@ -86,7 +86,8 @@ app.post('/geminiCompletion', async (req, res) => {
     console.log('Gemini API Key:', gemini_api_key);
     console.log('Gemini Config:', geminiConfig);
 
-    const { default: fetch } = await import('node-fetch');
+    // Import node-fetch dynamically
+    const fetch = (await import('node-fetch')).default;
 
     const geminiModel = googleAI.getGenerativeModel({
       model: 'gemini-pro',
