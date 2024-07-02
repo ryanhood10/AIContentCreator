@@ -101,7 +101,8 @@ function MainPage() {
 
     try {
       const response = await fetch(
-        "https://localhost:3001/completions",
+        "https://ai-social-media-poster-a1f841196f5b.herokuapp.com/completions",
+        // "https://localhost:3001/completions",
         options
       );
       const data = await response.json();
@@ -135,8 +136,9 @@ function MainPage() {
 
     if (dallePromptFromStorage) {
       try {
-        const response = await fetch("https://localhost:3001/dalleCompletion", {
-          method: "POST",
+        // const response = await fetch("https://localhost:3001/dalleCompletion", {
+          const response = await fetch("https://ai-social-media-poster-a1f841196f5b.herokuapp.com/dalleCompletion", {
+            method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
@@ -224,7 +226,8 @@ function MainPage() {
     setIsLoading(true);
     try {
       console.log("Sending request with options:", options); // Added logging
-      const response = await fetch("http://localhost:3001/geminiCompletion", options);
+      const response = await fetch("https://ai-social-media-poster-a1f841196f5b.herokuapp.com/geminiCompletion", options);
+      // const response = await fetch("http://localhost:3001/geminiCompletion", options);
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
