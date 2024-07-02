@@ -39,6 +39,7 @@ function MainPage() {
   const [optimizedPost, setOptimizedPost] = useState("");
 
   const postRef = useRef(null);
+  const seoPost = useRef(null);
 
   useEffect(() => {
     // Load Dalle Prompt from localStorage if available
@@ -90,7 +91,7 @@ function MainPage() {
           `Length: Keep it concise and engaging (ideally under ${characterLimit} characters for ${platformName}).\n` +
           `Brand Voice: Maintain a consistent brand voice throughout the post.\n` +
           `Additional Details:\n` + additionalDetails +
-          `... Be sure to respond with the post in quotation marks, and at the end of your response, give me a short, detailed, and contextually relevant prompt to give to DALLE-3 image generation AI to create a captivating image that complements this post. Please put the DALLE-3 prompt in brackets [], and don't include any other square brackets in your response aside from that prompt.`
+          `... Be sure to respond with the post in quotation marks, and at the end of your response, give me a short, detailed, and contextually relevant prompt to give to DALLE-3 image generation AI to create a captivating image that complements this post. Please put the DALLE-3 prompt in brackets [], and don't include any other square brackets in your response aside from that prompt. On the DALLE-3 prompt, be sure to specify only 1-2 subjects in the prompt as to reduce hallucination on image creation. `
       }),
       headers: {
         "Content-Type": "application/json",
@@ -195,7 +196,23 @@ function MainPage() {
       (err) => console.error("Failed to copy:", err)
     );
   };
+  const copyGeneratedPost2 = () => {
+    const postText = seoPost.current.textContent;
+    
+    // Regex to match text within quotation marks and square brackets
+    const regex = /^"(.*)"\s*\[([^\]]*)\]$/;
+    
+    // Extract text within quotation marks and remove content within square brackets using regex
+    const match = postText.match(regex);
   
+    // If there's a match, extract the content within quotes and without square brackets
+    let cleanedText = match ? match[1] : postText;
+  
+    navigator.clipboard.writeText(cleanedText).then(
+      () => alert("Copied to clipboard!"),
+      (err) => console.error("Failed to copy:", err)
+    );
+  };
 
   //GEMINI CODE 
   const handleOptimizePost = async () => {
@@ -399,6 +416,7 @@ function MainPage() {
           <div>
           <h2 className="text-2xl font-semibold mt-6">Generated Post:</h2>
         <div className="h-full flex flex-col justify-center items-center">
+        <p className="text-gray-600 font-mono"> Made with ChatGPT</p>
           <div className="border p-4 mt-2 rounded-xl shadow-xl w-full flex flex-col justify-center items-center relative">
             <div className="h-full flex flex-col overflow-y-auto justify-center items-center">
               <div className="flex-grow p-10" ref={postRef}>
@@ -423,10 +441,26 @@ function MainPage() {
 )}
 
         {optimizedPost && (
-          <div className="mt-6">
-            <h2 className="text-2xl font-semibold">Dalle Image:</h2>
+                 <div>
+                 <h2 className="text-2xl font-semibold mt-6">Optimized Post:</h2>
+               <div className="h-full flex flex-col justify-center items-center">
+                <p className="text-gray-600 font-mono">Search Engine Optimized with Google's Gemini AI</p>
+                 <div className="border p-4 mt-2 rounded-xl shadow-xl w-full flex flex-col justify-center items-center relative">
+                   <div className="h-full flex flex-col overflow-y-auto justify-center items-center">
+          <div className="flex-grow p-10" ref={seoPost}>
             <p>{optimizedPost}</p>
-          </div>        )}
+            </div>
+            <button
+                onClick={copyGeneratedPost2}
+                className="absolute bottom-4 right-4 bg-blue-500 text-white hover:bg-blue-600 py-1 px-3 rounded-full font-medium text-center"
+              >
+                Copy Post
+              </button>
+              </div>   
+              </div>   
+              </div>   
+              </div>   
+               )}
 
         {imageUrl && (
           <div className="mt-6">
@@ -438,6 +472,7 @@ function MainPage() {
         {dallePrompt && (
           <div className="mt-6">
             <h2 className="text-2xl font-semibold">Dalle Prompt:</h2>
+            <p className="text-gray-600 font-mono">Want an image for your post? Generate one below with OpenAI's DALLE-3 AI</p>
             <div className="border p-4 mt-2 rounded-xl shadow-xl w-full">
               <p>{dallePrompt}</p>
        
