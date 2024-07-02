@@ -6,9 +6,10 @@
         "heroku-postbuild": "npm install --prefix client && npm run build --prefix client"
     },
     "dependencies": {
+        "cors": "^2.8.5",
+        "dotenv": "^16.4.5",
         "express": "^4.17.1",
-        "react-router-dom": "^6.24.0",
-        "dotenv": "^16.4.5"
+        "react-router-dom": "^6.24.0"
     },
     "engines": {
         "node": "16.x",
