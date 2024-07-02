@@ -2,7 +2,6 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const fetch = require('node-fetch');
 const axios = require('axios');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
@@ -86,6 +85,8 @@ app.post('/geminiCompletion', async (req, res) => {
 
     console.log('Gemini API Key:', gemini_api_key);
     console.log('Gemini Config:', geminiConfig);
+
+    const { default: fetch } = await import('node-fetch');
 
     const geminiModel = googleAI.getGenerativeModel({
       model: 'gemini-pro',
