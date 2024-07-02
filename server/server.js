@@ -4,7 +4,6 @@ const cors = require('cors');
 const path = require('path');
 const axios = require('axios');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
-const fetch = require('node-fetch');  // Import node-fetch version 2
 
 const gemini_api_key = process.env.GEMINI_API_KEY;
 if (!gemini_api_key) {
@@ -93,6 +92,9 @@ app.post('/geminiCompletion', async (req, res) => {
     });
 
     console.log('Generating content for prompt:', prompt);
+
+    // Dynamically import node-fetch
+    const fetch = (await import('node-fetch')).default;
     const result = await geminiModel.generateContent(prompt, { fetch });
     const response = await result.response.text();
 
