@@ -37,6 +37,8 @@ function MainPage() {
   const [isLoadingDalle, setIsLoadingDalle] = useState(false); // State to track Dalle loading
   const [selectedSize, setSelectedSize] = useState("1024x1024"); // Default size option
   const [optimizedPost, setOptimizedPost] = useState("");
+  const [customDallePrompt, setCustomDallePrompt] = useState(""); // State to hold custom DALLE prompt
+  const [showCustomPromptInput, setShowCustomPromptInput] = useState(false); // State to toggle custom prompt input visibility
 
   const postRef = useRef(null);
   const seoPost = useRef(null);
@@ -138,8 +140,8 @@ function MainPage() {
     if (dallePromptFromStorage) {
       try {
         // const response = await fetch("https://localhost:3001/dalleCompletion", {
-          const response = await fetch("https://ai-social-media-poster-a1f841196f5b.herokuapp.com/dalleCompletion", {
-            method: "POST",
+        const response = await fetch("https://ai-social-media-poster-a1f841196f5b.herokuapp.com/dalleCompletion", {
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
@@ -164,6 +166,42 @@ function MainPage() {
       }
     } else {
       console.error("No Dalle Prompt available in localStorage.");
+      setIsLoadingDalle(false); // Ensure loading state is set to false in case of error
+    }
+  };
+
+  const handleCustomDalleCompletion = async () => {
+    if (!customDallePrompt) {
+      alert("Please enter a custom prompt");
+      return;
+    }
+
+    // Set loading state to true when starting Dalle completion
+    setIsLoadingDalle(true);
+
+    try {
+      const response = await fetch("https://ai-social-media-poster-a1f841196f5b.herokuapp.com/dalleCompletion", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          dallePrompt: customDallePrompt,
+          imageSize: selectedSize // Include selected image size in the request body
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to complete DALLE-3 request");
+      }
+
+      const responseData = await response.json();
+      const image = responseData.imageUrl;
+      setImageUrl(image); // Set the image URL state
+      setIsLoadingDalle(false); // Set loading state to false after completing Dalle completion
+      console.log("DALLE-3 request sent successfully!");
+    } catch (error) {
+      console.error("Error completing DALLE-3 request:", error);
       setIsLoadingDalle(false); // Ensure loading state is set to false in case of error
     }
   };
@@ -256,10 +294,6 @@ function MainPage() {
       setIsLoading(false);
     }
   };
-  
-  
-  
-  
 
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col items-center justify-center pt-32 md:pt-56">
@@ -412,55 +446,55 @@ function MainPage() {
           </div>
         )}
 
-          {generatedPost && ( 
+        {generatedPost && ( 
           <div>
-          <h2 className="text-2xl font-semibold mt-6">Generated Post:</h2>
-        <div className="h-full flex flex-col justify-center items-center">
-        <p className="text-gray-600 font-mono"> Made with ChatGPT</p>
-          <div className="border p-4 mt-2 rounded-xl shadow-xl w-full flex flex-col justify-center items-center relative">
-            <div className="h-full flex flex-col overflow-y-auto justify-center items-center">
-              <div className="flex-grow p-10" ref={postRef}>
-                {formatPost(generatedPost)}
+            <h2 className="text-2xl font-semibold mt-6">Generated Post:</h2>
+            <div className="h-full flex flex-col justify-center items-center">
+              <p className="text-gray-600 font-mono"> Made with ChatGPT</p>
+              <div className="border p-4 mt-2 rounded-xl shadow-xl w-full flex flex-col justify-center items-center relative">
+                <div className="h-full flex flex-col overflow-y-auto justify-center items-center">
+                  <div className="flex-grow p-10" ref={postRef}>
+                    {formatPost(generatedPost)}
+                  </div>
+                  <button
+                    onClick={copyGeneratedPost}
+                    className="absolute bottom-4 right-4 bg-blue-500 text-white hover:bg-blue-600 py-1 px-3 rounded-full font-medium text-center"
+                  >
+                    Copy Post
+                  </button>
+                  <button
+                    onClick={handleOptimizePost}
+                    className="absolute bottom-4 bg-green-500 text-white hover:bg-green-600 py-1 px-3 rounded-full font-medium text-center"
+                  >
+                    Optimize Post with Gemini
+                  </button>
+                </div>
               </div>
-              <button
-                onClick={copyGeneratedPost}
-                className="absolute bottom-4 right-4 bg-blue-500 text-white hover:bg-blue-600 py-1 px-3 rounded-full font-medium text-center"
-              >
-                Copy Post
-              </button>
-              <button
-                onClick={handleOptimizePost}
-                className="absolute bottom-4  bg-green-500 text-white hover:bg-green-600 py-1 px-3 rounded-full font-medium text-center"
-              >
-                Optimize Post with Gemini
-              </button>
             </div>
           </div>
-          </div>
-        </div>
-)}
+        )}
 
         {optimizedPost && (
-                 <div>
-                 <h2 className="text-2xl font-semibold mt-6">Optimized Post:</h2>
-               <div className="h-full flex flex-col justify-center items-center">
-                <p className="text-gray-600 font-mono">Search Engine Optimized with Google's Gemini AI</p>
-                 <div className="border p-4 mt-2 rounded-xl shadow-xl w-full flex flex-col justify-center items-center relative">
-                   <div className="h-full flex flex-col overflow-y-auto justify-center items-center">
-          <div className="flex-grow p-10" ref={seoPost}>
-            <p>{optimizedPost}</p>
+          <div>
+            <h2 className="text-2xl font-semibold mt-6">Optimized Post:</h2>
+            <div className="h-full flex flex-col justify-center items-center">
+              <p className="text-gray-600 font-mono">Search Engine Optimized with Google's Gemini AI</p>
+              <div className="border p-4 mt-2 rounded-xl shadow-xl w-full flex flex-col justify-center items-center relative">
+                <div className="h-full flex flex-col overflow-y-auto justify-center items-center">
+                  <div className="flex-grow p-10" ref={seoPost}>
+                    <p>{optimizedPost}</p>
+                  </div>
+                  <button
+                    onClick={copyGeneratedPost2}
+                    className="absolute bottom-4 right-4 bg-blue-500 text-white hover:bg-blue-600 py-1 px-3 rounded-full font-medium text-center"
+                  >
+                    Copy Post
+                  </button>
+                </div>
+              </div>
             </div>
-            <button
-                onClick={copyGeneratedPost2}
-                className="absolute bottom-4 right-4 bg-blue-500 text-white hover:bg-blue-600 py-1 px-3 rounded-full font-medium text-center"
-              >
-                Copy Post
-              </button>
-              </div>   
-              </div>   
-              </div>   
-              </div>   
-               )}
+          </div>
+        )}
 
         {imageUrl && (
           <div className="mt-6">
@@ -475,7 +509,36 @@ function MainPage() {
             <p className="text-gray-600 font-mono">Want an image for your post? Generate one below with OpenAI's DALLE-3 AI</p>
             <div className="border p-4 mt-2 rounded-xl shadow-xl w-full">
               <p>{dallePrompt}</p>
-       
+              <p className="text-xs text-gray-500 mt-2">
+                Don't like the image results from the prompt above?{" "}
+                <span
+                  onClick={() => setShowCustomPromptInput(true)}
+                  className="text-blue-500 cursor-pointer underline"
+                >
+                  Click Here
+                </span>{" "}
+                to try your own custom prompt.
+              </p>
+
+              {showCustomPromptInput && (
+                <div className="mt-2 flex items-center">
+                  <input
+                    type="text"
+                    className="ml-2 bg-gray-200 rounded-lg shadow-sm w-full"
+                    value={customDallePrompt}
+                    onChange={(e) => setCustomDallePrompt(e.target.value)}
+                  />
+                  <button
+                    onClick={handleCustomDalleCompletion}
+                    className="bg-green-500 text-white hover:bg-green-600 py-1 px-3 rounded-full font-medium ml-2"
+                  >
+                    Try Custom Prompt
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         <div className="mt-6">
           <h2 className="text-2xl font-semibold">Select Image Size:</h2>
@@ -515,14 +578,12 @@ function MainPage() {
           </div>
         </div>
 
-           
         {/* Button to trigger DALLE-3 completion */}
         <button
           className="bg-green-500 text-white hover:bg-green-600 py-2 px-4 rounded-full font-medium text-center w-full mt-4"
           onClick={handleDalleCompletion}
           disabled={!dallePrompt} // Disable if no Dalle Prompt available
         >
-          
           {isLoadingDalle ? (
             <div className="flex items-center justify-center">
               <ThreeDots type="ThreeDots" color="#FFF" height={20} width={20} />
@@ -532,10 +593,7 @@ function MainPage() {
             "Complete with DALLE-3 AI"
           )}
         </button>
-        </div>
 
- </div>
-           )}
         <p className="text-red-400 pt-8 text-center">
           Please note that the character limit varies based on the selected platform.
           <br />
