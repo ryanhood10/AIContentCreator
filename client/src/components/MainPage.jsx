@@ -298,13 +298,10 @@ function MainPage() {
 
 // Function to download the image
 const downloadDalleImage = () => {
-  const link = document.createElement('a');
-  link.href = imageUrl;
-  link.download = imageTitle || 'dalle_image'; // Use the image title or a default name
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  const newWindow = window.open(imageUrl, '_blank');
+  newWindow.focus();
 };
+
 
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col items-center justify-center pt-32 md:pt-56">
