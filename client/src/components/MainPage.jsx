@@ -510,13 +510,6 @@ const downloadDalleImage = () => {
             <h2 className="text-2xl font-semibold">Dalle Image:</h2>
             <div className="border p-4 mt-2 rounded-xl shadow-xl w-full relative">
               <img src={imageUrl} alt="Dalle AI Generated" className="mt-2 rounded-xl shadow-xl w-full" />
-              <input 
-                type="text"
-                className="ml-2 bg-gray-200 rounded-lg shadow-sm w-full mt-2"
-                placeholder="Enter image title"
-                value={imageTitle}
-                onChange={(e) => setImageTitle(e.target.value)}
-              />
               <button
                 onClick={downloadDalleImage}
                 className="absolute bottom-4 right-4 bg-blue-500 text-white hover:bg-blue-600 py-1 px-3 rounded-full font-medium text-center"
