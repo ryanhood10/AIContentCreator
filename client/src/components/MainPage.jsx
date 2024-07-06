@@ -39,6 +39,7 @@ function MainPage() {
   const [optimizedPost, setOptimizedPost] = useState("");
   const [customDallePrompt, setCustomDallePrompt] = useState(""); // State to hold custom DALLE prompt
   const [showCustomPromptInput, setShowCustomPromptInput] = useState(false); // State to toggle custom prompt input visibility
+  const [imageTitle, setImageTitle] = useState(""); // State to hold the image title
 
   const postRef = useRef(null);
   const seoPost = useRef(null);
@@ -295,6 +296,16 @@ function MainPage() {
     }
   };
 
+// Function to download the image
+const downloadDalleImage = () => {
+  const link = document.createElement('a');
+  link.href = imageUrl;
+  link.download = imageTitle || 'dalle_image'; // Use the image title or a default name
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col items-center justify-center pt-32 md:pt-56">
       <div className="bg-white p-8 rounded-xl shadow-xl w-[80%]">
@@ -496,12 +507,29 @@ function MainPage() {
           </div>
         )}
 
-        {imageUrl && (
+        
+{imageUrl && (
           <div className="mt-6">
             <h2 className="text-2xl font-semibold">Dalle Image:</h2>
-            <img src={imageUrl} alt="Dalle AI Generated" className="mt-2 rounded-xl shadow-xl w-full" />
+            <div className="border p-4 mt-2 rounded-xl shadow-xl w-full relative">
+              <img src={imageUrl} alt="Dalle AI Generated" className="mt-2 rounded-xl shadow-xl w-full" />
+              <input 
+                type="text"
+                className="ml-2 bg-gray-200 rounded-lg shadow-sm w-full mt-2"
+                placeholder="Enter image title"
+                value={imageTitle}
+                onChange={(e) => setImageTitle(e.target.value)}
+              />
+              <button
+                onClick={downloadDalleImage}
+                className="absolute bottom-4 right-4 bg-blue-500 text-white hover:bg-blue-600 py-1 px-3 rounded-full font-medium text-center"
+              >
+                Download Image
+              </button>
+            </div>
           </div>
         )}
+
 
         {dallePrompt && (
           <div className="mt-6">
