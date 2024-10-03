@@ -1,26 +1,28 @@
-import React from "react";
-import { Link } from "react-router-dom"; // Import Link for navigation
-import AkiraLogo from './images/AkiraLogoTransparent.webp'
+import React from 'react';
+import Logo from './images/PalmtreeLeftLogo.webp';
+import {Link} from 'react-router-dom';
+
 
 const Header = () => {
   return (
-    <header className="fixed top-0 left-0 w-full bg-white shadow-lg z-10">
-      <div className="container mx-auto px-4 py-2 flex items-center justify-between">
-        <Link to="https://akirawebsolutions.com/">
-          <div className="flex items-center">
+    <header className="bg-gray-900 text-gray-300 py-4 sticky top-0 z-50">
+      <div className="container mx-auto px-4 flex items-center justify-between">
+        <div className="flex-1 text-left mb-4 md:mb-0">
+        <Link to="/" className="hover:cursor-pointer ">
+        <h1 className="text-3xl font-bold text-cyan-500 hover:text-cyan-900">Product Listing Optimizer</h1>          </Link>
+          <p className="text-sm text-gray-400">by Shoreline Consulting</p>
+        </div>
+        <div className="flex flex-col items-center md:justify-end">
+          <a href="https://creativecoloring.io/" target="_blank" rel="noopener noreferrer">
             <img
-              src={AkiraLogo}
-              alt="Akira Logo"
-              className=" mr-2"
+              src={Logo}
+              alt="Akira Web Solutions Logo"
+              className="h-8 rounded-xl"
             />
-            <h1 className="text-red-500 font-sans font-bold text-4xl">
-              Akira Web Solutions
-            </h1>
-            <h2 className="pl-16 font-sans font-semibold "> SEO | Custom Website Builds | AI Virtual Agents | Web Solutions</h2>
-          </div>
-        </Link>
-        <div className="font-sans font-light hidden md:block">
-          Based out of Nashville, TN
+          </a>
+          <a href="https://akirawebsolutions.com" target="_blank" rel="noopener noreferrer" className="mt-2 text-white hover:text-cyan-300">
+            Visit Us
+          </a>
         </div>
       </div>
     </header>

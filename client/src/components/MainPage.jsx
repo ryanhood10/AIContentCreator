@@ -1,23 +1,42 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ThreeDots } from 'react-loader-spinner';
-import { FaFacebook, FaYoutube, FaTiktok, FaInstagram, FaTwitter, FaPinterest } from 'react-icons/fa';
+import { FaFacebook, FaYoutube, FaTiktok, FaInstagram, FaTwitter, FaPinterest, FaLinkedin } from 'react-icons/fa';
 
 const platforms = [
+  { name: "LinkedIn", icon: FaLinkedin, characterLimit: 3000 }, // Professional platform
   { name: "Facebook", icon: FaFacebook, characterLimit: 63206 },
+  { name: "Instagram", icon: FaInstagram, characterLimit: 2200 },
+  { name: "Twitter", icon: FaTwitter, characterLimit: 280 },
+];
+
+// Additional platforms that will be revealed when "More" is clicked
+const morePlatforms = [
   { name: "YouTube", icon: FaYoutube, characterLimit: 5000 },
   { name: "YouTube Shorts", icon: FaYoutube, characterLimit: 1000 },
   { name: "TikTok", icon: FaTiktok, characterLimit: 150 },
-  { name: "Instagram", icon: FaInstagram, characterLimit: 2200 },
-  { name: "Twitter", icon: FaTwitter, characterLimit: 280 },
   { name: "Pinterest", icon: FaPinterest, characterLimit: 500 },
 ];
 
-const tones = ["Informative", "Humorous", "Inspirational"];
 
-const postTypes = [
-  "Post/Update Caption", "Q&A/Poll", "Video Caption", "Carousel/Infographic Caption",
-  "Meme Caption", "Blog Post Teaser", "Promotion", "Holiday Greeting", "Other"
+const tones = ["Not Specified", "Informative", "Humorous", "Inspirational"];
+
+// Main post types (most commonly used by professionals)
+const mainPostTypes = [
+  "Post/Update Caption",
+  "Q&A/Poll",
+  "Video Caption",
+  "Carousel/Infographic Caption"
 ];
+
+const morePostTypes = [
+  "Meme Caption",
+  "Blog Post Teaser",
+  "Promotion",
+  "Holiday Greeting",
+  "Other"
+];
+
+
 
 function MainPage() {
   const [selectedPlatform, setSelectedPlatform] = useState(platforms[0].name);
@@ -25,8 +44,9 @@ function MainPage() {
   const [topic, setTopic] = useState("");
   const [targetAudience, setTargetAudience] = useState("");
   const [tone, setTone] = useState(tones[0]);
-  const [typeOfPost, setTypeOfPost] = useState(postTypes[0]);
+  const [typeOfPost, setTypeOfPost] = useState(mainPostTypes[0]); // Default to the first main post type
   const [additionalDetails, setAdditionalDetails] = useState("");
+  const [uniqueAngle, setUniqueAngle] = useState("");
   const [characterLimit, setCharacterLimit] = useState(platforms[0].characterLimit);
   const [generatedPost, setGeneratedPost] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -40,7 +60,14 @@ function MainPage() {
   const [customDallePrompt, setCustomDallePrompt] = useState(""); // State to hold custom DALLE prompt
   const [showCustomPromptInput, setShowCustomPromptInput] = useState(false); // State to toggle custom prompt input visibility
   const [imageTitle, setImageTitle] = useState(""); // State to hold the image title
-
+  const [showMore, setShowMore] = useState(false); // State to track if "More" platforms are shown
+  const [showMorePostTypes, setShowMorePostTypes] = useState(false); // To track if more post types are shown
+  const [otherPostType, setOtherPostType] = useState(""); // State for "Other" input when selected
+  const [showOtherPostInput, setShowOtherPostInput] = useState(false); // Show input for "Other"
+  
+  const handleShowMore = () => {
+    setShowMore(!showMore); // Toggle "More" platforms visibility
+  };
   const postRef = useRef(null);
   const seoPost = useRef(null);
 
@@ -70,11 +97,17 @@ function MainPage() {
     const { value } = event.target;
     setTypeOfPost(value);
     if (value === "Other") {
-      setShowOtherInput(true); // Show the "Other" input field if "Other" is selected
+      setShowOtherPostInput(true); // Show input for "Other"
     } else {
-      setShowOtherInput(false); // Hide the "Other" input field for other options
+      setShowOtherPostInput(false); // Hide the "Other" input field for other options
     }
   };
+  
+  // Handle "View More" toggle for post types
+  const handleShowMorePostTypes = () => {
+    setShowMorePostTypes(!showMorePostTypes); // Toggle "More" post types visibility
+  };
+  
 
   const handleSizeChange = (event) => {
     setSelectedSize(event.target.value);
@@ -303,100 +336,168 @@ const downloadDalleImage = () => {
 };
 
 
-  return (
-    <div className="bg-gray-100 min-h-screen flex flex-col items-center justify-center pt-32 md:pt-56">
-      <div className="bg-white p-8 rounded-xl shadow-xl w-[80%]">
+return (
+  <div className="bg-gray-100 min-h-screen min-w-screen flex flex-col items-center justify-center pt-32 md:pt-56">
+    <div className="bg-white border-gray-500 max-w-5xl mb-16  p-8 rounded-xl shadow-xl w-[80%]">
+      <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold text-center p-2">
-           Social Media Post Generator 
+          Social Media Post Generator
         </h1>
         <h2 className="mb-6 text-lg font-light">powered by ChatGPT, DALLE-3, and Gemini</h2>
 
-        <div className="mb-4">
-          <label className="block font-medium text-lg mb-2">Platform</label>
-          <div className="grid grid-cols-3 gap-4">
-            {platforms.map((p) => (
-              <div key={p.name} className="flex items-center">
-                <input
-                  type="radio"
-                  id={p.name}
-                  name="platform"
-                  value={p.name}
-                  checked={selectedPlatform === p.name}
-                  onChange={handlePlatformChange}
-                  className="mr-2"
-                />
-                <label htmlFor={p.name} className="flex items-center">
-                  <p.icon className="mr-1" /> {p.name}
-                </label>
-              </div>
-            ))}
-            <div className="flex items-center">
-              <input
-                type="radio"
-                id="Other"
-                name="platform"
-                value="Other"
-                checked={selectedPlatform === "Other"}
-                onChange={handlePlatformChange}
-                className="mr-2"
-              />
-              <label htmlFor="Other">Other</label>
-              {selectedPlatform === "Other" && (
-                <input
-                  type="text"
-                  className="ml-2 bg-gray-200 rounded-lg shadow-sm w-full"
-                  value={otherPlatform}
-                  onChange={(e) => setOtherPlatform(e.target.value)}
-                />
-              )}
-            </div>
-          </div>
-        </div>
 
-        <div className="mb-4">
-          <label className="block font-medium text-lg mb-2">Type of Post</label>
-          <div className="grid grid-cols-3 gap-4">
-            {postTypes.map((type) => (
-              <div key={type} className="flex items-center">
-                <input
-                  type="radio"
-                  id={type}
-                  name="typeOfPost"
-                  value={type}
-                  checked={typeOfPost === type}
-                  onChange={handleTypeOfPostChange}
-                  className="mr-2"
-                />
-                <label htmlFor={type}>{type}</label>
-              </div>
-            ))}
-            {showOtherInput && (
-              <input
-                type="text"
-                className="ml-2 bg-gray-200 rounded-lg shadow-sm w-full"
-                value={typeOfPost}
-                onChange={(e) => setTypeOfPost(e.target.value)}
-              />
-            )}
-          </div>
-        </div>
 
+        {/* Post Content */}
         <div className="mb-4">
-          <label className="block font-medium text-lg  mb-2">What do you want to post about?</label>
+          <label className="block font-medium text-lg mb-2">What do you want to post about?</label>
           <input
-            className="input-large bg-gray-200 rounded-lg shadow-sm resize-y h-24 w-full"
-            type="text"
+  className="bg-gray-200 rounded-lg shadow-sm resize-y h-24 w-full border border-gray-300 hover:border-blue-400 hover:border-2 hover:cursor-pointer focus:border-blue-500 focus:cursor-text transition-all duration-200 px-4 py-2 text-base md:text-lg sm:h-32 focus:outline-none"
+  type="text"
+  placeholder="What do you want to post about?"
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 md:gap-x-8">
+        <div className="grid grid-cols-2 gap-4">  {/* This creates two columns */}
+       {/* Platform Selection */}
+<div className="col-span-1 mb-4">
+  <label className="block font-medium text-lg mb-2">Platform</label>
+  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"> {/* Using md:grid-cols-2 for medium screens */}
+    {platforms.map((p) => (
+      <div key={p.name} className="flex text-sm items-center">
+        <input
+          type="radio"
+          id={p.name}
+          name="platform"
+          value={p.name}
+          checked={selectedPlatform === p.name}
+          onChange={handlePlatformChange}
+          className="mr-2"
+        />
+        <label htmlFor={p.name} className="flex items-center">
+          <p.icon className="mr-1" /> {p.name}
+        </label>
+      </div>
+    ))}
+    {/* Show More/Show Less */}
+    {!showMore ? (
+      <button
+        className="text-blue-500 font-medium cursor-pointer"
+        onClick={handleShowMore}
+      >
+        More...
+      </button>
+    ) : (
+      <>
+        {morePlatforms.map((p) => (
+          <div key={p.name} className="flex text-sm items-center">
+            <input
+              type="radio"
+              id={p.name}
+              name="platform"
+              value={p.name}
+              checked={selectedPlatform === p.name}
+              onChange={handlePlatformChange}
+              className="mr-2"
+            />
+            <label htmlFor={p.name} className="flex items-center">
+              <p.icon className="mr-1" /> {p.name}
+            </label>
+          </div>
+        ))}
+        <button
+          className="text-blue-500 font-medium cursor-pointer mt-2"
+          onClick={handleShowMore}
+        >
+          View Less
+        </button>
+      </>
+    )}
+  </div>
+</div>
+
+
+       {/* Type of Post */}
+<div className="col-span-1 mb-4">
+  <label className="block font-medium text-lg mb-2">Type of Post</label>
+  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"> {/* Using md:grid-cols-2 for medium screens */}
+    {/* Main post types */}
+    {mainPostTypes.map((type) => (
+      <div key={type} className="flex text-sm text-start items-center">
+        <input
+          type="radio"
+          id={type}
+          name="typeOfPost"
+          value={type}
+          checked={typeOfPost === type}
+          onChange={handleTypeOfPostChange}
+          className="mr-2"
+        />
+        <label htmlFor={type}>{type}</label>
+      </div>
+    ))}
+
+    {/* Show More/Show Less functionality */}
+    {!showMorePostTypes ? (
+      <button
+        className="text-blue-500 font-medium cursor-pointer"
+        onClick={handleShowMorePostTypes}
+      >
+        More...
+      </button>
+    ) : (
+      <>
+        {/* Additional post types */}
+        {morePostTypes.map((type) => (
+          <div key={type} className="flex text-sm items-center">
+            <input
+              type="radio"
+              id={type}
+              name="typeOfPost"
+              value={type}
+              checked={typeOfPost === type}
+              onChange={handleTypeOfPostChange}
+              className="mr-2"
+            />
+            <label htmlFor={type}>{type}</label>
+          </div>
+        ))}
+
+        {/* "Other" input when selected */}
+        {showOtherPostInput && (
+          <input
+            type="text"
+            className="mt-2 bg-gray-200 rounded-lg shadow-sm w-full px-4 py-2 text-base"
+            value={otherPostType}
+            onChange={(e) => setOtherPostType(e.target.value)}
+            placeholder="Enter other post type"
+          />
+        )}
+
+        {/* View Less button to collapse additional post types */}
+        <button
+          className="text-blue-500 font-medium cursor-pointer mt-2"
+          onClick={handleShowMorePostTypes}
+        >
+          View Less
+        </button>
+      </>
+    )}
+  </div>
+</div>
+
+
+</div>
+
+        {/* Target Audience and Tone */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="mb-4">
             <label className="block font-medium mb-2">Target Audience</label>
             <input
-              className="input-large bg-gray-200 rounded-lg w-full shadow-sm"
+              className="bg-gray-200 rounded-lg w-full shadow-sm"
               type="text"
+              placeholder="(optional)"
               value={targetAudience}
               onChange={(e) => setTargetAudience(e.target.value)}
             />
@@ -404,7 +505,7 @@ const downloadDalleImage = () => {
           <div className="mb-4">
             <label className="block font-medium mb-2">Tone</label>
             <select
-              className="input-large bg-gray-200 rounded-lg w-full shadow-sm"
+              className="bg-gray-200 rounded-lg w-full shadow-sm"
               value={tone}
               onChange={(e) => setTone(e.target.value)}
             >
@@ -417,7 +518,19 @@ const downloadDalleImage = () => {
           </div>
         </div>
 
-        <div className="mb-4">
+{/* Unique Angle */}
+<div className="mb-4">
+  <textarea
+    className="bg-gray-200 rounded-lg shadow-sm resize-y h-24 w-full border border-gray-300 hover:border-blue-400 hover:border-2 hover:cursor-pointer focus:border-blue-500 focus:cursor-text transition-all duration-200 px-4 py-2 text-base md:text-lg sm:h-32 focus:outline-none"
+    placeholder="Enter a unique angle you want to take. (optional)"
+    value={uniqueAngle}
+    onChange={(e) => setUniqueAngle(e.target.value)}
+  />
+</div>
+
+
+        {/* Additional Details */}
+ <div className="mb-4">
           <label
             className="block font-medium mb-2 cursor-pointer text-blue-500 active:text-blue-800 hover:text-blue-400"
             onClick={toggleAdditionalDetails}
@@ -430,18 +543,20 @@ const downloadDalleImage = () => {
               <br />
               * Any specific branding guidelines or restrictions.
               <br />
-              * Desired posting time (if known)
+              * Desired posting time (if known).
             </div>
           )}
           <textarea
-            className="input-large bg-gray-200 rounded-lg shadow-sm resize-y h-24 w-full"
+  className="bg-gray-200 rounded-lg shadow-sm resize-y h-24 w-full border border-gray-300 hover:border-blue-400 hover:border-2 hover:cursor-pointer focus:border-blue-500 focus:cursor-text transition-all duration-200 px-4 py-2 text-base md:text-lg sm:h-32 focus:outline-none"
+  placeholder='Additional Details (optional)'
             value={additionalDetails}
             onChange={(e) => setAdditionalDetails(e.target.value)}
           />
         </div>
 
+        {/* Generate Post Button */}
         <button
-          className="bg-blue-500 text-white hover:bg-blue-600 py-2 px-4 rounded-full font-medium text-center w-full"
+          className="bg-blue-500 text-white hover:bg-blue-600 py-4 px-4 rounded-full font-medium text-center w-full"
           onClick={handleGeneratePost}
         >
           Generate Post
@@ -454,65 +569,62 @@ const downloadDalleImage = () => {
           </div>
         )}
 
-        {generatedPost && ( 
-          <div>
-            <h2 className="text-2xl font-semibold mt-6">Generated Post:</h2>
-            <div className="h-full flex flex-col justify-center items-center">
-              <p className="text-gray-600 font-mono"> Made with ChatGPT</p>
-              <div className="border p-4 mt-2 rounded-xl shadow-xl w-full flex flex-col justify-center items-center relative">
-                <div className="h-full flex flex-col overflow-y-auto justify-center items-center">
-                  <div className="flex-grow p-10" ref={postRef}>
-                    {formatPost(generatedPost)}
-                  </div>
-                  <button
-                    onClick={copyGeneratedPost}
-                    className="absolute bottom-4 right-4 bg-blue-500 text-white hover:bg-blue-600 py-1 px-3 rounded-full font-medium text-center"
-                  >
-                    Copy Post
-                  </button>
-                  <button
-                    onClick={handleOptimizePost}
-                    className="absolute bottom-4 bg-green-500 text-white hover:bg-green-600 py-1 px-3 rounded-full font-medium text-center"
-                  >
-                    Optimize Post with Gemini
-                  </button>
-                </div>
+        {/* Generated Post */}
+        {generatedPost && (
+          <div className="mt-6">
+            <h2 className="text-2xl font-semibold">Generated Post:</h2>
+            <div className="border p-4 rounded-xl shadow-xl w-full mt-2">
+              <div className="flex-grow p-10" ref={postRef}>
+                {formatPost(generatedPost)}
+              </div>
+              <div className="flex justify-between mt-4">
+                <button
+                  onClick={copyGeneratedPost}
+                  className="bg-blue-500 text-white hover:bg-blue-600 py-2 px-4 rounded-full font-medium"
+                >
+                  Copy Post
+                </button>
+                <button
+                  onClick={handleOptimizePost}
+                  className="bg-green-500 text-white hover:bg-green-600 py-2 px-4 rounded-full font-medium"
+                >
+                  Optimize Post with Gemini
+                </button>
               </div>
             </div>
           </div>
         )}
 
+        {/* Optimized Post */}
         {optimizedPost && (
-          <div>
-            <h2 className="text-2xl font-semibold mt-6">Optimized Post:</h2>
-            <div className="h-full flex flex-col justify-center items-center">
-              <p className="text-gray-600 font-mono">Search Engine Optimized with Google's Gemini AI</p>
-              <div className="border p-4 mt-2 rounded-xl shadow-xl w-full flex flex-col justify-center items-center relative">
-                <div className="h-full flex flex-col overflow-y-auto justify-center items-center">
-                  <div className="flex-grow p-10" ref={seoPost}>
-                    <p>{optimizedPost}</p>
-                  </div>
-                  <button
-                    onClick={copyGeneratedPost2}
-                    className="absolute bottom-4 right-4 bg-blue-500 text-white hover:bg-blue-600 py-1 px-3 rounded-full font-medium text-center"
-                  >
-                    Copy Post
-                  </button>
-                </div>
+          <div className="mt-6">
+            <h2 className="text-2xl font-semibold">Optimized Post:</h2>
+            <div className="border p-4 rounded-xl shadow-xl w-full mt-2">
+              <p className="text-gray-600 font-mono">
+                Search Engine Optimized with Google's Gemini AI
+              </p>
+              <div className="flex-grow p-10" ref={seoPost}>
+                <p>{optimizedPost}</p>
               </div>
+              <button
+                onClick={copyGeneratedPost2}
+                className="bg-blue-500 text-white hover:bg-blue-600 py-2 px-4 rounded-full font-medium mt-4"
+              >
+                Copy Post
+              </button>
             </div>
           </div>
         )}
 
-        
-{imageUrl && (
+        {/* DALLE Image */}
+        {imageUrl && (
           <div className="mt-6">
             <h2 className="text-2xl font-semibold">Dalle Image:</h2>
-            <div className="border p-4 mt-2 rounded-xl shadow-xl w-full relative">
-              <img src={imageUrl} alt="Dalle AI Generated" className="mt-2 rounded-xl shadow-xl w-full" />
+            <div className="border p-4 rounded-xl shadow-xl w-full relative mt-2">
+              <img src={imageUrl} alt="Dalle AI Generated" className="rounded-xl shadow-xl w-full" />
               <button
                 onClick={downloadDalleImage}
-                className="absolute bottom-4 right-4 bg-blue-500 text-white hover:bg-blue-600 py-1 px-3 rounded-full font-medium text-center"
+                className="absolute bottom-4 right-4 bg-blue-500 text-white hover:bg-blue-600 py-2 px-4 rounded-full font-medium"
               >
                 Download Image
               </button>
@@ -520,35 +632,33 @@ const downloadDalleImage = () => {
           </div>
         )}
 
-
+        {/* DALLE Prompt */}
         {dallePrompt && (
           <div className="mt-6">
             <h2 className="text-2xl font-semibold">Dalle Prompt:</h2>
-            <p className="text-gray-600 font-mono">Want an image for your post? Generate one below with OpenAI's DALLE-3 AI</p>
-            <div className="border p-4 mt-2 rounded-xl shadow-xl w-full">
+            <div className="border p-4 rounded-xl shadow-xl w-full mt-2">
               <p>{dallePrompt}</p>
               <p className="text-xs text-gray-500 mt-2">
-                Don't like the image results from the prompt above?{" "}
+                Want to generate your own custom prompt?{" "}
                 <span
                   onClick={() => setShowCustomPromptInput(true)}
                   className="text-blue-500 cursor-pointer underline"
                 >
                   Click Here
-                </span>{" "}
-                to try your own custom prompt.
+                </span>
               </p>
 
               {showCustomPromptInput && (
                 <div className="mt-2 flex items-center">
                   <input
                     type="text"
-                    className="ml-2 bg-gray-200 rounded-lg shadow-sm w-full"
+                    className="bg-gray-200 rounded-lg shadow-sm w-full"
                     value={customDallePrompt}
                     onChange={(e) => setCustomDallePrompt(e.target.value)}
                   />
                   <button
                     onClick={handleCustomDalleCompletion}
-                    className="bg-green-500 text-white hover:bg-green-600 py-1 px-3 rounded-full font-medium ml-2"
+                    className="bg-green-500 text-white hover:bg-green-600 py-2 px-4 rounded-full font-medium ml-2"
                   >
                     Try Custom Prompt
                   </button>
@@ -558,6 +668,7 @@ const downloadDalleImage = () => {
           </div>
         )}
 
+        {/* Image Size Selection */}
         <div className="mt-6">
           <h2 className="text-2xl font-semibold">Select Image Size:</h2>
           <div className="flex items-center mt-2">
@@ -596,11 +707,10 @@ const downloadDalleImage = () => {
           </div>
         </div>
 
-        {/* Button to trigger DALLE-3 completion */}
         <button
-          className="bg-green-500 text-white hover:bg-green-600 py-2 px-4 rounded-full font-medium text-center w-full mt-4"
+          className="bg-green-500 text-white hover:bg-green-600 py-4 px-4 rounded-full font-medium text-center w-full mt-4"
           onClick={handleDalleCompletion}
-          disabled={!dallePrompt} // Disable if no Dalle Prompt available
+          disabled={!dallePrompt}
         >
           {isLoadingDalle ? (
             <div className="flex items-center justify-center">
@@ -608,7 +718,7 @@ const downloadDalleImage = () => {
               <span className="ml-2">Generating Image...</span>
             </div>
           ) : (
-            "Complete with DALLE-3 AI"
+            "Generate an Image"
           )}
         </button>
 
@@ -619,7 +729,9 @@ const downloadDalleImage = () => {
         </p>
       </div>
     </div>
-  );
+  </div>
+);
+
 }
 
 export default MainPage;
