@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ThreeDots } from 'react-loader-spinner';
-import { FaFacebook, FaYoutube, FaTiktok, FaInstagram, FaTwitter, FaPinterest, FaLinkedin } from 'react-icons/fa';
+import { FaFacebook, FaYoutube, FaTiktok, FaInstagram, FaTwitter, FaPinterest, FaLinkedin, FaShareAlt, FaPencilAlt, FaClipboardList, FaUsers, FaSmile, FaInfoCircle, FaPaintBrush } from 'react-icons/fa';
 
 const platforms = [
   { name: "LinkedIn", icon: FaLinkedin, characterLimit: 3000 }, // Professional platform
@@ -337,11 +337,11 @@ const downloadDalleImage = () => {
 
 
 return (
-  <div className="bg-gray-100 min-h-screen min-w-screen flex flex-col items-center justify-center pt-32 md:pt-56">
-    <div className="bg-white border-gray-500 max-w-5xl mb-16  p-8 rounded-xl shadow-xl w-[80%]">
+  <div className="bg-gray-100 min-h-screen min-w-screen flex flex-col items-center justify-center pt-16 md:pt-24">
+    <div className="bg-white border-gray-500 max-w-5xl mb-16 md:mb-24  p-8 rounded-xl shadow-xl w-[80%]">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold text-center p-2">
-          Social Media Post Generator
+        <FaPencilAlt className="inline-block mr-2" /> Social Media Post Generator
         </h1>
         <h2 className="mb-6 text-lg font-light">powered by ChatGPT, DALLE-3, and Gemini</h2>
 
@@ -359,10 +359,13 @@ return (
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">  {/* This creates two columns */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
+          
        {/* Platform Selection */}
 <div className="col-span-1 mb-4">
-  <label className="block font-medium text-lg mb-2">Platform</label>
+  
+  <label className="block font-medium text-lg mb-2 bg-slate-100">   <FaShareAlt className="inline-block mr-2" /> Platform</label>
+
   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"> {/* Using md:grid-cols-2 for medium screens */}
     {platforms.map((p) => (
       <div key={p.name} className="flex text-sm items-center">
@@ -415,12 +418,13 @@ return (
       </>
     )}
   </div>
+  <hr className="py-4 mt-4 w-[80%] mx-auto" />
 </div>
 
 
        {/* Type of Post */}
 <div className="col-span-1 mb-4">
-  <label className="block font-medium text-lg mb-2">Type of Post</label>
+  <label className="block font-medium bg-slate-100 text-lg mb-2">  <FaClipboardList className="inline-block mr-2" />Type of Post</label>
   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"> {/* Using md:grid-cols-2 for medium screens */}
     {/* Main post types */}
     {mainPostTypes.map((type) => (
@@ -485,6 +489,8 @@ return (
       </>
     )}
   </div>
+  <hr className="py-4 mt-4 w-[80%] mx-auto" />
+
 </div>
 
 
@@ -493,7 +499,7 @@ return (
         {/* Target Audience and Tone */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="mb-4">
-            <label className="block font-medium mb-2">Target Audience</label>
+            <label className="block font-medium text-lg mb-2">  <FaUsers className="inline-block mr-2" /> Target Audience</label>
             <input
               className="bg-gray-200 rounded-lg w-full shadow-sm"
               type="text"
@@ -503,7 +509,7 @@ return (
             />
           </div>
           <div className="mb-4">
-            <label className="block font-medium mb-2">Tone</label>
+            <label className="block font-medium text-lg mb-2  ">  <FaSmile className="inline-block mr-2" /> Tone</label>
             <select
               className="bg-gray-200 rounded-lg w-full shadow-sm"
               value={tone}
@@ -520,6 +526,7 @@ return (
 
 {/* Unique Angle */}
 <div className="mb-4">
+<label className="block font-medium text-lg mb-2  ">  <FaPaintBrush className="inline-block mr-2" /> Unique Angle</label>
   <textarea
     className="bg-gray-200 rounded-lg shadow-sm resize-y h-24 w-full border border-gray-300 hover:border-blue-400 hover:border-2 hover:cursor-pointer focus:border-blue-500 focus:cursor-text transition-all duration-200 px-4 py-2 text-base md:text-lg sm:h-32 focus:outline-none"
     placeholder="Enter a unique angle you want to take. (optional)"
@@ -535,13 +542,15 @@ return (
             className="block font-medium mb-2 cursor-pointer text-blue-500 active:text-blue-800 hover:text-blue-400"
             onClick={toggleAdditionalDetails}
           >
-            Additional Details (optional)
+              <FaInfoCircle className="inline-block mr-2" /> Additional Details (optional)
           </label>
           {showAdditionalDetails && (
             <div className="font-sm text-gray-500 mb-2">
               * Recent trends or news related to the topic.
               <br />
               * Any specific branding guidelines or restrictions.
+              <br />
+               * Any hyperlinks you want to include.
               <br />
               * Desired posting time (if known).
             </div>
