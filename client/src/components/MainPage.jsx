@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ThreeDots } from 'react-loader-spinner';
-import { FaFacebook, FaYoutube, FaTiktok, FaInstagram, FaTwitter, FaPinterest, FaLinkedin, FaShareAlt, FaPencilAlt, FaClipboardList, FaUsers, FaSmile, FaInfoCircle, FaPaintBrush } from 'react-icons/fa';
+import { FaFacebook, FaYoutube, FaTiktok, FaInstagram, FaTwitter, FaPinterest, FaCamera, FaLinkedin, FaShareAlt, FaPencilAlt, FaClipboardList, FaUsers, FaSmile, FaInfoCircle, FaPaintBrush } from 'react-icons/fa';
 
 const platforms = [
   { name: "LinkedIn", icon: FaLinkedin, characterLimit: 3000 }, // Professional platform
@@ -338,7 +338,7 @@ const downloadDalleImage = () => {
 
 return (
   <div className="bg-gray-100 min-h-screen min-w-screen flex flex-col items-center justify-center pt-16 md:pt-24">
-    <div className="bg-white border-gray-500 max-w-5xl mb-16 md:mb-24  p-8 rounded-xl shadow-xl w-[80%]">
+    <div className="bg-white border-gray-500 max-w-5xl mb-8 md:mb-16  p-8 rounded-xl shadow-xl w-[80%]">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold text-center p-2">
         <FaPencilAlt className="inline-block mr-2" /> Social Media Post Generator
@@ -624,6 +624,26 @@ return (
             </div>
           </div>
         )}
+        
+       
+
+
+        {/* <p className="text-red-400 pt-8 text-center">
+          Please note that the character limit varies based on the selected platform.
+          <br />
+          * If the "Generate Post" button does not return a response, it is because your prompt is too long, or ChatGPT is too busy to perform a request at this time.
+        </p> */}
+      </div>
+    </div>
+
+    <p className="text-blue-400 w-[80%] text-md pb-8 text-center">
+          Want to create an image to go along with your post? Continue below.
+          </p>
+
+    <div className="bg-white border-gray-500 max-w-5xl mb-16 md:mb-24  p-8 rounded-xl shadow-xl w-[80%]">
+    <h2 className="text-4xl font-bold text-center p-2">
+        <FaCamera className="inline-block mr-2" /> Image Generator for Post
+        </h2>
 
         {/* DALLE Image */}
         {imageUrl && (
@@ -644,7 +664,7 @@ return (
         {/* DALLE Prompt */}
         {dallePrompt && (
           <div className="mt-6">
-            <h2 className="text-2xl font-semibold">Dalle Prompt:</h2>
+            <h3 className="text-2xl font-semibold">AI Prompt to Create Image:</h3>
             <div className="border p-4 rounded-xl shadow-xl w-full mt-2">
               <p>{dallePrompt}</p>
               <p className="text-xs text-gray-500 mt-2">
@@ -730,14 +750,7 @@ return (
             "Generate an Image"
           )}
         </button>
-
-        <p className="text-red-400 pt-8 text-center">
-          Please note that the character limit varies based on the selected platform.
-          <br />
-          * If the "Generate Post" button does not return a response, it is because your prompt is too long, or ChatGPT is too busy to perform a request at this time.
-        </p>
-      </div>
-    </div>
+        </div>
   </div>
 );
 
