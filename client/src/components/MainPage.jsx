@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ThreeDots } from 'react-loader-spinner';
-import { FaFacebook, FaYoutube, FaTiktok, FaInstagram, FaTwitter, FaPinterest, FaCamera, FaLinkedin, FaShareAlt, FaPencilAlt, FaClipboardList, FaUsers, FaSmile, FaInfoCircle, FaPaintBrush } from 'react-icons/fa';
+import { FaFacebook, FaYoutube, FaReddit, FaTiktok, FaInstagram, FaTwitter, FaPinterest, FaCamera, FaLinkedin, FaShareAlt, FaPencilAlt, FaClipboardList, FaUsers, FaSmile, FaInfoCircle, FaPaintBrush } from 'react-icons/fa';
 
 const platforms = [
   { name: "LinkedIn", icon: FaLinkedin, characterLimit: 3000 }, // Professional platform
@@ -12,9 +12,10 @@ const platforms = [
 // Additional platforms that will be revealed when "More" is clicked
 const morePlatforms = [
   { name: "YouTube", icon: FaYoutube, characterLimit: 5000 },
-  { name: "YouTube Shorts", icon: FaYoutube, characterLimit: 1000 },
   { name: "TikTok", icon: FaTiktok, characterLimit: 150 },
   { name: "Pinterest", icon: FaPinterest, characterLimit: 500 },
+  { name: "Reddit", icon: FaReddit, characterLimit: 40000 }
+
 ];
 
 
@@ -131,7 +132,7 @@ const [uniqueAngleSuggestions, setUniqueAngleSuggestions] = useState([]); // Hol
           `Length: Keep it concise and engaging (ideally under ${characterLimit} characters for ${platformName}).\n` +
           `Brand Voice: Maintain a consistent brand voice throughout the post.\n` +
           `Additional Details:\n` + additionalDetails +
-          `... Be sure to respond with the post in quotation marks, and at the end of your response, give me a short, detailed, and contextually relevant prompt to give to DALLE-3 image generation AI to create a captivating image that complements this post. Please put the DALLE-3 prompt in brackets [], and don't include any other square brackets in your response aside from that prompt. On the DALLE-3 prompt, be sure to specify only 1-2 subjects in the prompt as to reduce hallucination on image creation. `
+          `... Be sure to respond with the post in quotation marks, and at the end of your response, give me a concise and contextually relevant prompt to give to DALLE-3 image generation AI to create a captivating image that complements this post. Please put the DALLE-3 prompt in brackets [], and don't include any other square brackets in your response aside from that prompt. On the DALLE-3 prompt, be sure to specify only 1-2 subjects in the prompt as to reduce hallucination on image creation, and be sure to consider our topic and target audience. `
       }),
       headers: {
         "Content-Type": "application/json",
@@ -333,11 +334,12 @@ const [uniqueAngleSuggestions, setUniqueAngleSuggestions] = useState([]); // Hol
     }
   };
 
-// Function to download the image
-const downloadDalleImage = () => {
-  const newWindow = window.open(imageUrl, '_blank');
-  newWindow.focus();
+// Function to open the DALL·E image in a new window
+const openDalleImageInNewWindow = () => {
+  window.open(imageUrl, '_blank'); // Open the image in a new tab/window
 };
+
+
 
 
 // Function to format the unique angle suggestions text for display with ** for bold titles
@@ -352,7 +354,6 @@ const formatUniqueAngleSuggestions = (textArray) => {
     }
   });
 };
-
 
 // Function to handle fetching unique angles based on user input
 const handleGenerateUniqueAngle = async () => {
@@ -396,42 +397,6 @@ const handleGenerateUniqueAngle = async () => {
   }
 };
 
-// const handleGenerateUniqueAngles = async () => {
-//   const platformName = selectedPlatform === "Other" ? otherPlatform : selectedPlatform;
-  
-//   const options = {
-//     method: "POST",
-//     body: JSON.stringify({
-//       message:
-//       `Suggest 3 unique angles for a social media post on ${platformName} about ${topic}.\n` +
-//       `Target Audience: ${targetAudience}\n` +
-//       `Tone (ignore if no value): ${tone}\n` +
-//       `Type of Post: ${typeOfPost}\n` +
-//       `Consider current trends and user intent on ${platformName}.\n` +
-//       `Ensure the angles are engaging, informative, and align with the brand's voice. Avoid repeating angles that have been suggested previously. Only respond with a dotted list of the 3 angles.`
-//   }),
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
-//   };
-
-//   setIsLoading(true);
-
-//   try {
-//     const response = await fetch(
-//       "https://ai-social-media-poster-a1f841196f5b.herokuapp.com/completions",
-//       // "https://localhost:3001/completions",      
-//     );
-//     const data = await response.json();
-//     const suggestedAngles = data.text || "";
-
-//     setSuggestedAngles(suggestedAngles);
-//     setIsLoading(false);
-//   } catch (error) {
-//     console.error("Failed to generate unique angles:", error);
-//     setIsLoading(false);
-//   }
-// };
 
 
 return (
@@ -626,7 +591,7 @@ return (
 <div className="mb-4">
   <label className="block font-medium mb-2">Unique Angle:</label>
   <textarea
-    className="input-large bg-gray-200 rounded-lg shadow-sm resize-y h-24 w-3/4 hover:border-2 hover:cursor-pointer focus:border-blue-500 focus:cursor-text"
+    className="input-large bg-gray-200 rounded-lg shadow-sm resize-y h-24 w-full hover:border-2 hover:cursor-pointer focus:border-blue-500 focus:cursor-text"
     placeholder="Enter a unique angle here (optional)"
     value={uniqueAngle} // Replace with the state variable for unique angle
     onChange={(e) => setUniqueAngle(e.target.value)}
@@ -687,7 +652,7 @@ return (
           )}
           <textarea
   className="bg-gray-200 rounded-lg shadow-sm resize-y h-24 w-full border border-gray-300 hover:border-blue-400 hover:border-2 hover:cursor-pointer focus:border-blue-500 focus:cursor-text transition-all duration-200 px-4 py-2 text-base md:text-lg sm:h-32 focus:outline-none"
-  placeholder='Additional Details (optional)'
+  placeholder='Additional Details (optional) '
             value={additionalDetails}
             onChange={(e) => setAdditionalDetails(e.target.value)}
           />
@@ -756,7 +721,9 @@ return (
         )}
         
        
-
+        <p className="text-blue-400 w-[80%] text-md pt-8 mx-auto text-center">
+        <FaCamera className="inline-block mr-2" /> Want to create an image to go along with your post? Continue below.
+          </p>
 
         {/* <p className="text-red-400 pt-8 text-center">
           Please note that the character limit varies based on the selected platform.
@@ -766,39 +733,22 @@ return (
       </div>
     </div>
 
-    <p className="text-blue-400 w-[80%] text-md pb-8 text-center">
-          Want to create an image to go along with your post? Continue below.
-          </p>
+ 
 
     <div className="bg-white border-gray-500 max-w-5xl mb-16 md:mb-24  p-8 rounded-xl shadow-xl w-[80%]">
     <h2 className="text-4xl font-bold text-center p-2">
-        <FaCamera className="inline-block mr-2" /> Image Generator for Post
+        <FaCamera className="inline-block mr-2" /> Image Generator 
         </h2>
-
-        {/* DALLE Image */}
-        {imageUrl && (
-          <div className="mt-6">
-            <h2 className="text-2xl font-semibold">Dalle Image:</h2>
-            <div className="border p-4 rounded-xl shadow-xl w-full relative mt-2">
-              <img src={imageUrl} alt="Dalle AI Generated" className="rounded-xl shadow-xl w-full" />
-              <button
-                onClick={downloadDalleImage}
-                className="absolute bottom-4 right-4 bg-blue-500 text-white hover:bg-blue-600 py-2 px-4 rounded-full font-medium"
-              >
-                Download Image
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* DALLE Prompt */}
         {dallePrompt && (
           <div className="mt-6">
-            <h3 className="text-2xl font-semibold">AI Prompt to Create Image:</h3>
-            <div className="border p-4 rounded-xl shadow-xl w-full mt-2">
-              <p>{dallePrompt}</p>
-              <p className="text-xs text-gray-500 mt-2">
-                Want to generate your own custom prompt?{" "}
+            <div className="border p-4 mx-auto rounded-xl shadow-xl w-3/4 mt-2">
+            <h3 className="text-xl lg:text-2xl py-2 font-semibold">Recomended AI Prompt to Create Image:</h3>
+              <p className="font-light text:sm lg:text-md">{dallePrompt}</p>
+              <p className="text-xs lg:text-sm text-gray-500 mt-2">
+                Want to try your own custom prompt?{" "}
+                <br className="block md:hidden" />
                 <span
                   onClick={() => setShowCustomPromptInput(true)}
                   className="text-blue-500 cursor-pointer underline"
@@ -816,11 +766,24 @@ return (
                     onChange={(e) => setCustomDallePrompt(e.target.value)}
                   />
                   <button
-                    onClick={handleCustomDalleCompletion}
-                    className="bg-green-500 text-white hover:bg-green-600 py-2 px-4 rounded-full font-medium ml-2"
-                  >
-                    Try Custom Prompt
-                  </button>
+  onClick={handleCustomDalleCompletion}
+  className={`py-2 px-4 rounded-full font-medium ml-2 ${
+    isLoadingDalle
+      ? 'bg-gray-400 cursor-not-allowed'  // Inactive state styling
+      : 'bg-green-500 hover:bg-green-600 text-white'  // Active state styling
+  }`}
+  disabled={isLoadingDalle}  // Disable when loading
+>
+  {isLoadingDalle ? (
+    <div className="flex items-center justify-center">
+      <ThreeDots type="ThreeDots" color="#FFF" height={20} width={20} />
+      <span className="ml-2">Generating Image...</span>
+    </div>
+  ) : (
+    "Try Custom Prompt"
+  )}
+</button>
+
                 </div>
               )}
             </div>
@@ -829,8 +792,8 @@ return (
 
         {/* Image Size Selection */}
         <div className="mt-6">
-          <h2 className="text-2xl font-semibold">Select Image Size:</h2>
-          <div className="flex items-center mt-2">
+          <h2 className="text-xl lg:text-2xl font-semibold">Select Image Size:</h2>
+          <div className="mx-auto text-xs md:font-medium lg:text-lg lg:font-normal flex items-center mt-2">
             <input
               type="radio"
               id="1024x1024"
@@ -867,19 +830,48 @@ return (
         </div>
 
         <button
-          className="bg-green-500 text-white hover:bg-green-600 py-4 px-4 rounded-full font-medium text-center w-full mt-4"
-          onClick={handleDalleCompletion}
-          disabled={!dallePrompt}
-        >
-          {isLoadingDalle ? (
-            <div className="flex items-center justify-center">
-              <ThreeDots type="ThreeDots" color="#FFF" height={20} width={20} />
-              <span className="ml-2">Generating Image...</span>
-            </div>
-          ) : (
-            "Generate an Image"
-          )}
-        </button>
+  className={`py-4 px-4 rounded-full font-medium text-center w-full mt-4 ${
+    isLoadingDalle
+      ? 'bg-gray-400 cursor-not-allowed'  // Inactive state styling
+      : 'bg-green-500 hover:bg-green-600 text-white'  // Active state styling
+  }`}
+  onClick={handleDalleCompletion}
+  disabled={isLoadingDalle || !dallePrompt}  // Disable when loading or no Dalle prompt
+>
+  {isLoadingDalle ? (
+    <div className="flex items-center justify-center">
+      <ThreeDots type="ThreeDots" color="#FFF" height={20} width={20} />
+      <span className="ml-2">Generating Image...</span>
+    </div>
+  ) : (
+    "Generate an Image"
+  )}
+</button>
+
+{/* DALLE Image */}
+{imageUrl && (
+  <div className="mt-6">
+    <h2 className="text-2xl font-semibold">Dalle Image:</h2>
+    <div className="border rounded-xl shadow-xl w-full max-w-[600px] h-auto relative mt-2 mx-auto"> {/* Define a max width and auto height */}
+      <img 
+        src={imageUrl} 
+        alt="Dalle AI Generated" 
+        className="rounded-xl shadow-xl w-full h-auto object-contain" 
+      />
+      <button
+        onClick={openDalleImageInNewWindow} 
+        className="absolute text-xs md:text-sm bottom-4 right-4 bg-blue-500 bg-opacity-50 text-white border border-blue-500 hover:bg-opacity-90 hover:border-white py-2 px-4 rounded-full font-medium transition-all duration-200 ease-in-out shadow-md backdrop-blur-sm hover:scale-105"
+      >
+        View Full Screen
+      </button>
+    </div>
+  </div>
+)}
+
+
+
+
+
         </div>
   </div>
 );
