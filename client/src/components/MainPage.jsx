@@ -46,7 +46,6 @@ function MainPage() {
   const [tone, setTone] = useState(tones[0]);
   const [typeOfPost, setTypeOfPost] = useState(mainPostTypes[0]); // Default to the first main post type
   const [additionalDetails, setAdditionalDetails] = useState("");
-  const [uniqueAngle, setUniqueAngle] = useState("");
   const [characterLimit, setCharacterLimit] = useState(platforms[0].characterLimit);
   const [generatedPost, setGeneratedPost] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -64,7 +63,12 @@ function MainPage() {
   const [showMorePostTypes, setShowMorePostTypes] = useState(false); // To track if more post types are shown
   const [otherPostType, setOtherPostType] = useState(""); // State for "Other" input when selected
   const [showOtherPostInput, setShowOtherPostInput] = useState(false); // Show input for "Other"
-  
+const [uniqueAngles, setUniqueAngles] = useState([]);
+const [uniqueAngle, setUniqueAngle] = useState(""); // Holds user input for unique angles
+const [isUniqueAngleLoading, setIsUniqueAngleLoading] = useState(false); // Tracks loading state
+const [showUniqueAngleSuggestions, setShowUniqueAngleSuggestions] = useState(false); // Tracks visibility of unique angle suggestions
+const [uniqueAngleSuggestions, setUniqueAngleSuggestions] = useState([]); // Holds the list of unique angle suggestions
+
   const handleShowMore = () => {
     setShowMore(!showMore); // Toggle "More" platforms visibility
   };
@@ -336,6 +340,100 @@ const downloadDalleImage = () => {
 };
 
 
+// Function to format the unique angle suggestions text for display with ** for bold titles
+const formatUniqueAngleSuggestions = (textArray) => {
+  return textArray.map((text, index) => {
+    if (text.startsWith('**') && text.endsWith('**')) {
+      return (
+        <p key={index} className="my-2 font-bold">{text.replace(/\*\*/g, '')}</p> // Remove the ** and bolden
+      );
+    } else {
+      return <span key={index}>{text}, </span>; // Display other angles separated by commas
+    }
+  });
+};
+
+
+// Function to handle fetching unique angles based on user input
+const handleGenerateUniqueAngle = async () => {
+  setIsUniqueAngleLoading(true);
+  setShowUniqueAngleSuggestions(true); // Set to true when the button is clicked
+  const platformName = selectedPlatform === "Other" ? otherPlatform : selectedPlatform; // Add this line here to define platformName
+
+  const options = {
+    method: "POST",
+    body: JSON.stringify({
+      message:
+        `Suggest 3 unique angles for a social media post on ${platformName} about ${topic}.\n` +
+        `Target Audience: ${targetAudience}\n` +
+        `Tone (ignore if no value): ${tone}\n` +
+        `Type of Post: ${typeOfPost}\n` +
+        `Consider current trends and user intent on ${platformName}.\n` +
+        `Ensure the angles are engaging, informative, and align with the brand's voice. Avoid repeating angles that have been suggested previously. Only respond with a dotted list of the 3 angles.`
+    }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  try {
+    const response = await fetch("https://product-seo-optimizer-b5addb5025ae.herokuapp.com/completions", options);
+    const data = await response.json();
+    
+    if (data.text) {
+      const uniqueAngleArray = data.text
+        .split('\n')
+        .map((angle) => angle.replace('* ', '').trim()) // Clean up the angle by removing leading characters and trimming whitespace
+        .filter((angle) => angle.length > 0); // Filter out any empty or blank entries
+      setUniqueAngleSuggestions(uniqueAngleArray);
+    } else {
+      setUniqueAngleSuggestions([]);
+    }
+    setIsUniqueAngleLoading(false);
+  } catch (error) {
+    console.error("Failed to generate unique angle suggestions:", error);
+    setIsUniqueAngleLoading(false);
+  }
+};
+
+// const handleGenerateUniqueAngles = async () => {
+//   const platformName = selectedPlatform === "Other" ? otherPlatform : selectedPlatform;
+  
+//   const options = {
+//     method: "POST",
+//     body: JSON.stringify({
+//       message:
+//       `Suggest 3 unique angles for a social media post on ${platformName} about ${topic}.\n` +
+//       `Target Audience: ${targetAudience}\n` +
+//       `Tone (ignore if no value): ${tone}\n` +
+//       `Type of Post: ${typeOfPost}\n` +
+//       `Consider current trends and user intent on ${platformName}.\n` +
+//       `Ensure the angles are engaging, informative, and align with the brand's voice. Avoid repeating angles that have been suggested previously. Only respond with a dotted list of the 3 angles.`
+//   }),
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//   };
+
+//   setIsLoading(true);
+
+//   try {
+//     const response = await fetch(
+//       "https://ai-social-media-poster-a1f841196f5b.herokuapp.com/completions",
+//       // "https://localhost:3001/completions",      
+//     );
+//     const data = await response.json();
+//     const suggestedAngles = data.text || "";
+
+//     setSuggestedAngles(suggestedAngles);
+//     setIsLoading(false);
+//   } catch (error) {
+//     console.error("Failed to generate unique angles:", error);
+//     setIsLoading(false);
+//   }
+// };
+
+
 return (
   <div className="bg-gray-100 min-h-screen min-w-screen flex flex-col items-center justify-center pt-16 md:pt-24">
     <div className="bg-white border-gray-500 max-w-5xl mb-8 md:mb-16  p-8 rounded-xl shadow-xl w-[80%]">
@@ -524,16 +622,48 @@ return (
           </div>
         </div>
 
-{/* Unique Angle */}
+{/* Unique Angle input */}
 <div className="mb-4">
-<label className="block font-medium text-lg mb-2  ">  <FaPaintBrush className="inline-block mr-2" /> Unique Angle</label>
+  <label className="block font-medium mb-2">Unique Angle:</label>
   <textarea
-    className="bg-gray-200 rounded-lg shadow-sm resize-y h-24 w-full border border-gray-300 hover:border-blue-400 hover:border-2 hover:cursor-pointer focus:border-blue-500 focus:cursor-text transition-all duration-200 px-4 py-2 text-base md:text-lg sm:h-32 focus:outline-none"
-    placeholder="Enter a unique angle you want to take. (optional)"
-    value={uniqueAngle}
+    className="input-large bg-gray-200 rounded-lg shadow-sm resize-y h-24 w-3/4 hover:border-2 hover:cursor-pointer focus:border-blue-500 focus:cursor-text"
+    placeholder="Enter a unique angle here (optional)"
+    value={uniqueAngle} // Replace with the state variable for unique angle
     onChange={(e) => setUniqueAngle(e.target.value)}
   />
+  <p className="font-light">🚀 Need suggestions for unique angles? 
+    <br/>Fill out the rest of the form and 
+    <a
+      className="text-blue-500 font-medium cursor-pointer underline ml-2"
+      onClick={handleGenerateUniqueAngle}
+    >
+      Click Here
+    </a>.
+  </p>
 </div>
+
+{/* Unique Angle Loading Spinner */}
+{isUniqueAngleLoading && (
+  <div className="flex items-center justify-center mb-4">
+    <ThreeDots
+      type="ThreeDots"
+      color="#FF6347"
+      height={50}
+      width={50}
+    />
+    <p className="ml-2">Generating unique angles...</p>
+  </div>
+)}
+
+{/* Unique Angle Suggestions */}
+{showUniqueAngleSuggestions && uniqueAngleSuggestions.length > 0 && (
+  <div className="h-full flex flex-col justify-center items-center">
+    <div className="border p-4 mt-2 rounded-xl shadow-xl w-full mb-6 flex flex-col justify-center items-center relative">
+      <h2 className="text-2xl font-bold text-blue-600 text-center p-2">Generated Unique Angles:</h2>
+      <p className="text-lg">{formatUniqueAngleSuggestions(uniqueAngleSuggestions)}</p>
+    </div>
+  </div>
+)}
 
 
         {/* Additional Details */}
